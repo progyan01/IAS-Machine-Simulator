@@ -1,0 +1,36 @@
+//Loop Check (L <= R)
+LOAD M(101)               //load R into AC
+SUB M(100)                //subtract L from AC (R-L)
+JUMP+ M(2)                //if AC is non-negative jump to memory address 2
+HALT                      //halts the program if jump is not executed, i.e, R-L<0
+
+//Calculate MID
+LOAD M(100)               //load L into AC
+ADD M(101)                //add R to AC (L+R)
+RSH                       //right shifts AC by 1 bit, equivalent to dividing it by 2 so (L+R)/2
+STOR M(102)               //store the result in the MID variable
+
+//Address Modification
+LOAD M(107)               //loads a "dummy" instruction which just says LOAD M(0)
+ADD M(106)                //adds the base address of array which is 500, so instruction becomes LOAD M(500)
+ADD M(102)                //adds mid so effectively intrusction becomes LOAD M(500+MID)
+STOR_L M(6)               //stores only the address part of AC into left instruction of memory address 6
+
+//Fetch & Compare
+LOAD M(0)                 //at runtime, due to intrusction at memory address 5, this has been overwritten to LOAD M(500+MID)
+SUB M(103)                //subtracts our target from arr[MID]
+JUMP+ M(10)               //if result is non-negative, i.e., arr[MID]>=TARGET we jump to memory address 10
+NOP                       //padding to cleanly start next instruction
+
+//Go Right (L = MID + 1); we reach here if arr[MID]<TARGET
+LOAD M(102)               //load MID into AC
+ADD M(105)                //add one to AC
+STOR M(100)               //update L with the new value (MID+1)
+JUMP M(0)                 //jump back to memory address 0 to restart the loop
+
+//Found & Go Left (R = MID - 1); we reach here if arr[MID]>=TARGET
+LOAD M(102)               //load MID into AC    
+STOR M(104)               //store AC into ANS variable (AC still contains MID)
+SUB M(105)                //subtract 1 from AC
+STOR M(101)               //update R with the new value (MID-1)
+JUMP M(0)                 //jump back to memory address 0 to restart the loop
