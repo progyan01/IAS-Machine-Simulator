@@ -29,8 +29,30 @@ STOR M(100)               //update L with the new value (MID+1)
 JUMP M(0)                 //jump back to memory address 0 to restart the loop
 
 //Found & Go Left (R = MID - 1); we reach here if arr[MID]>=TARGET
-LOAD M(102)               //load MID into AC    
+LOAD M(102)               //load MID into AC
 STOR M(104)               //store AC into ANS variable (AC still contains MID)
 SUB M(105)                //subtract 1 from AC
 STOR M(101)               //update R with the new value (MID-1)
 JUMP M(0)                 //jump back to memory address 0 to restart the loop
+
+//Variables
+DATA 100 0                //L
+DATA 101 9                //R
+DATA 102 0                //MID
+DATA 103 25               //TARGET
+DATA 104 -1               //ANS
+DATA 105 1                //ONE
+DATA 106 500              //BASE ADDRESS
+DATA 107 4294967296       //TEMPLATE LOAD M(0)
+
+//Sorted Array Data
+DATA 500 10               
+DATA 501 20
+DATA 502 24
+DATA 503 25
+DATA 504 25
+DATA 505 30
+DATA 506 40
+DATA 507 50
+DATA 508 60
+DATA 509 70

@@ -8,25 +8,26 @@ OPCODES = {
     'JUMP': '00001101', 'JUMP+': '00001111'
 }
 
-#Variables & Array Data
-MEMORY_DATA = {
-    100: 0, 101: 9, 102: 0, 103: 25, 104: -1, 105: 1, 106: 500,
-    #L, R, MID, TARGET, ANS, constant 1; in order
-    107: 1 << 32, #Template instruction "LOAD M(0)"
-    #Sorted Array
-    500: 10, 501: 20, 502: 24, 503: 25, 504: 25,
-    505: 30, 506: 40, 507: 50, 508: 60, 509: 70
-}
-
 def assemble(input_file, output_file):
     lines = []        #To store the final clean assembly code
-    
+    memory_data = {}  #To store variables defined via DATA directive
+
     #Read assembly code file
     with open(input_file, 'r') as f:
         for line in f:
             #Strip comments and whitespace
             clean = line.split('//')[0].strip().upper()
-            if clean: lines.append(clean)
+            if not clean: continue
+            
+            #Check for Assembler Directives (DATA)
+            if clean.startswith("DATA"):
+                parts = clean.split()
+                #Format: DATA <Address> <Value>
+                address = int(parts[1])
+                value = int(parts[2])
+                memory_data[address] = value
+            else:
+                lines.append(clean)
 
     #Convert pairs of instructions to binary pairs
     with open(output_file, 'w') as f:
@@ -59,11 +60,15 @@ def assemble(input_file, output_file):
             f.write(pair_binary + '\n')
 
         #Write Data (Variables + Array) and fill each gap with 40 bit 0 string
-        current_addr = (len(lines) + 1) // 2            #Calculate how many code lines we wrote
-        max_addr = max(MEMORY_DATA.keys())              #Last address of our memory
+        #Calculate where the instruction code ends
+        code_lines_count = (len(lines) + 1) // 2 
+        current_addr = code_lines_count
+        
+        #Determine the highest memory address we need to write to
+        max_addr = max(memory_data.keys()) if memory_data else code_lines_count
         
         while current_addr <= max_addr:
-            val = MEMORY_DATA.get(current_addr, 0)
+            val = memory_data.get(current_addr, 0)
             #Handle negative numbers for 40-bit binary
             if val < 0: val = (1 << 40) + val
             f.write(format(val, '040b') + '\n')

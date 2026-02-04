@@ -40,4 +40,3 @@ python3 ias.py
 The simulator will print a cycle-by-cycle trace of the processor state, showing the Program Counter (PC), Instruction Register (IR), Accumulator (AC), and others. Finally printing the answer.
 
 ---
-
